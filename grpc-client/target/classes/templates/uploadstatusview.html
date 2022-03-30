@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>Matrix Operations</title>
+</head>
+<body>
+<div th:if="${msg}">
+    <h1 th:text="${msg}"></span>
+</div>
+<div th:if="${success} == false">
+    <a href="/">Go back</a>
+</div>
+<div th:if="${success} == true">
+    <h3>Matrix 1</h3>
+        <span style="white-space: pre-line" th:text="${matrix1}"></span>
+    <h3>Matrix 2</h3>
+        <span style="white-space: pre-line" th:text="${matrix2}"></span>    
+    <form action="/add" method="post">
+        <input type="hidden" name="filePath1" th:value="${m1path}"/>
+        <input type="hidden" name="filePath2" th:value="${m2path}"/>
+        <input type="hidden" name="dimensions" th:value="${dimensions}" />
+        <button>Add</button>
+    </form>
+    <form action="/multiply" method="post">
+        <input type="hidden" name="filePath1" th:value="${m1path}"/>
+        <input type="hidden" name="filePath2" th:value="${m2path}"/>
+        <input type="hidden" name="dimensions" th:value="${dimensions}" />
+        <button>Multiply</button>
+    </form>
+</div>
+</body>
+</html>

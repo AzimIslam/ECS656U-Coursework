@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>Matrix Operations</title>
+</head>
+<body>
+    <h1>Please upload two files that contain matrices</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="files" multiple>
+        <input type="submit" value="Upload Files"></input>
+    </form>
+</body>
+</html>
