@@ -18,7 +18,8 @@ import java.util.*;
 @Service
 public class GRPCClientService {
     public String ping() {
-        	ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090)
+			// coursework-2 instance
+        	ManagedChannel channel = ManagedChannelBuilder.forAddress("10.128.0.12", 9090)
                 .usePlaintext()
                 .build();        
 		PingPongServiceGrpc.PingPongServiceBlockingStub stub
@@ -30,7 +31,7 @@ public class GRPCClientService {
 		return helloResponse.getPong();
     }
     public String add(double[][] m1, double[][] m2){
-		ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost",9090)
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("10.128.0.12",9090)
 		.usePlaintext()
 		.build();
 		MatrixServiceGrpc.MatrixServiceBlockingStub stub
