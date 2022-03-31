@@ -33,7 +33,7 @@ public class GRPCClientService {
 		return helloResponse.getPong();
     }
     public String add(double[][] m1, double[][] m2){
-		final String[] IP_ADDR = {"10.128.0.12", "10.128.0.13", "10.128.0.14",  "10.128.0.15", "10.128.0.16", "10.128.0.2", "10.128.0.20", "10.128.0.21"};
+		final String[] IP_ADDR = {"35.222.9.50", "34.66.0.91", "35.238.180.188",  "34.69.186.132", "34.67.205.167", "35.194.11.26", "34.67.18.167", "34.133.18.14"};
 		
 		final ManagedChannel[] channels = {
 			ManagedChannelBuilder.forAddress(IP_ADDR[0], 9090).usePlaintext().build(), 
