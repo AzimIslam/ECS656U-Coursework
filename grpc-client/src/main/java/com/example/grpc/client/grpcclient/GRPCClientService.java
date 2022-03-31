@@ -33,7 +33,7 @@ public class GRPCClientService {
 		return helloResponse.getPong();
     }
     public String add(double[][] m1, double[][] m2){
-		final String[] IP_ADDR = {"35.222.9.50", "34.66.0.91", "35.238.180.188",  "34.69.186.132", "34.67.205.167", "35.194.11.26", "34.67.18.167", "34.133.18.14"};
+		final String[] IP_ADDR = {"35.222.9.50", "34.66.0.91", "35.238.180.188",  "34.69.186.132", "34.67.18.167", "35.194.11.26", "34.67.205.167", "34.133.18.14"};
 		
 		final ManagedChannel[] channels = {
 			ManagedChannelBuilder.forAddress(IP_ADDR[0], 9090).usePlaintext().build(), 
@@ -60,8 +60,11 @@ public class GRPCClientService {
 		String resp="";
 
 		if (m1.length > 2) {
-			int numberOfRows = m1.length / IP_ADDR.length;
 			int numOfServersRequired = m1.length == 4 ? 4: 8;
+			int numberOfRows = m1.length / numOfServersRequired ;
+
+			System.out.println("Number of rows per server: " + numberOfRows);
+			System.out.println("Number of servers required: " + numOfServersRequired);
 
 			MatrixRequest.Builder[] requests = new MatrixRequest.Builder[numOfServersRequired];
 
@@ -69,49 +72,43 @@ public class GRPCClientService {
 				requests[i] = MatrixRequest.newBuilder();
 			}
 
-			/*
-			for (int server=0; server < numOfServersRequired; server++) {
-				int startingPos = 0;
-				int endingPos = 0;
-				for (int row = 0; row < m1.length; row++) {
-					Row.Builder tempRow = Row.newBuilder();
-					for (int col = 0; col < m1[row].length; col++) {
-						tempRow.addNumber(m1[row][col]);
-					}
-					requests[server].addA(tempRow);
-				}
-	
-				for (int row = 0; row < m2.length; row++) {
-					Row.Builder tempRow = Row.newBuilder();
-					for (int col = 0; col < m2[row].length; col++) {
-						tempRow.addNumber(m2[row][col]);
-					}
-					requests[server].addA(tempRow);
-				}
-			}*/
-
 			int serverPtr = 0;
 			int row = 0;
 
 			while(serverPtr < numOfServersRequired) {
-				for (int i = row; i < numberOfRows * (serverPtr + 1); i++) {
+				for (int i = row; i < row + numberOfRows; i++) {
 					Row.Builder tempRow = Row.newBuilder();
-					for (int col = 0; col < m1[i].length; col++) {
-						tempRow.addNumber(m1[row][col]);
+					for (int col = 0; col < m1.length; col++) {
+						tempRow.addNumber(m1[i][col]);
 					}
 					requests[serverPtr].addA(tempRow);
 				}
 
 				for (int i = row; i < numberOfRows * (serverPtr + 1); i++) {
 					Row.Builder tempRow2 = Row.newBuilder();
-					for (int col = 0; col < m2[i].length; col++) {
-						tempRow2.addNumber(m2[row][col]);
+					for (int col = 0; col < m2.length; col++) {
+						tempRow2.addNumber(m2[i][col]);
 					}
 					requests[serverPtr].addB(tempRow2);
 				}
 
 				row += numberOfRows;
 				serverPtr += 1;
+			}
+
+			MatrixReply[] replies = new MatrixReply[numOfServersRequired];
+
+			for(int i=0; i < replies.length; i++) {
+				replies[i] = stubs[i].addBlock(requests[i].build());
+			}
+
+			for(int i=0; i < replies.length; i++) {
+				for(int j=0; j < replies[i].getCList().size(); j++) {
+					for (int k=0; k < replies[i].getCList().get(j).getNumberList().size(); k++) {
+						resp += replies[i].getCList().get(j).getNumber(k) + " ";
+					}
+					resp += "<br>";
+				}
 			}
 
 		} else {
