@@ -22,6 +22,7 @@ package matrixmult;
 
 // The matrix service definition.
 service MatrixService{
+  rpc ParallelMatrixMultiplyBlock(MatrixMultParallelRequest) returns (MatrixReply) {}
   rpc MultiplyBlock (MatrixRequest) returns (MatrixReply) {}
   rpc AddBlock (MatrixRequest) returns (MatrixReply) {}
 }
@@ -39,5 +40,12 @@ message Row {
 // The response message containing the result marix
 message MatrixReply {
   repeated Row c = 1;
+}
+
+message MatrixMultParallelRequest {
+  repeated Row a = 1;
+  repeated Row b = 2;
+  int32 start = 3;
+  int32 end = 4;
 }
 
