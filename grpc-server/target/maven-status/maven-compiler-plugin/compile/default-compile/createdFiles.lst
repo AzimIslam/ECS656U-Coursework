@@ -1,6 +1,7 @@
 com/example/grpc/server/grpcserver/MatrixReply$1.class
 com/example/grpc/server/grpcserver/HelloServiceOuterClass.class
 com/example/grpc/server/grpcserver/HelloRequest.class
+com/example/grpc/server/grpcserver/MatrixMultParallelRequest.class
 com/example/grpc/server/grpcserver/MatrixMult$1.class
 com/example/grpc/server/grpcserver/PingPongServiceGrpc$1.class
 com/example/grpc/server/grpcserver/PingPongServiceOuterClass$1.class
@@ -12,6 +13,7 @@ com/example/grpc/server/grpcserver/MatrixRequest$Builder.class
 com/example/grpc/server/grpcserver/MatrixServiceGrpc.class
 com/example/grpc/server/grpcserver/PingPongServiceGrpc.class
 com/example/grpc/server/grpcserver/HelloResponse$Builder.class
+com/example/grpc/server/grpcserver/MatrixMultParallelRequest$1.class
 com/example/grpc/server/grpcserver/Row$Builder.class
 com/example/grpc/server/grpcserver/PingRequest$Builder.class
 com/example/grpc/server/grpcserver/MatrixServiceGrpc$MatrixServiceStub.class
@@ -44,7 +46,9 @@ com/example/grpc/server/grpcserver/HelloServiceOuterClass$1.class
 com/example/grpc/server/grpcserver/MatrixReply.class
 com/example/grpc/server/grpcserver/HelloResponse$1.class
 com/example/grpc/server/grpcserver/PingPongServiceImpl.class
+com/example/grpc/server/grpcserver/MatrixMultParallelRequest$Builder.class
 com/example/grpc/server/grpcserver/RowOrBuilder.class
+com/example/grpc/server/grpcserver/MatrixMultParallelRequestOrBuilder.class
 com/example/grpc/server/grpcserver/HelloServiceImpl.class
 com/example/grpc/server/grpcserver/PingPongServiceGrpc$PingPongServiceImplBase.class
 com/example/grpc/server/grpcserver/HelloServiceGrpc$HelloServiceStub.class
