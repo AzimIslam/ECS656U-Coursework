@@ -1,21 +1,20 @@
 package com.example.grpc.client.grpcclient;
 
-import com.example.grpc.server.grpcserver.PingRequest;
-import com.example.grpc.server.grpcserver.PongResponse;
-import com.example.grpc.server.grpcserver.PingPongServiceGrpc;
-import com.example.grpc.server.grpcserver.MatrixRequest;
+import java.util.List;
+
 import com.example.grpc.server.grpcserver.MatrixMultParallelRequest;
 import com.example.grpc.server.grpcserver.MatrixReply;
+import com.example.grpc.server.grpcserver.MatrixRequest;
 import com.example.grpc.server.grpcserver.MatrixServiceGrpc;
+import com.example.grpc.server.grpcserver.PingPongServiceGrpc;
+import com.example.grpc.server.grpcserver.PingRequest;
+import com.example.grpc.server.grpcserver.PongResponse;
 import com.example.grpc.server.grpcserver.Row;
+
+import org.springframework.stereotype.Service;
+
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.*;
-import java.lang.Math;
 
 @Service
 public class GRPCClientService {
@@ -34,7 +33,7 @@ public class GRPCClientService {
 		return helloResponse.getPong();
     }
     public String add(double[][] m1, double[][] m2){
-		final String[] IP_ADDR = {"35.222.9.50", "34.66.0.91", "35.238.180.188",  "34.69.186.132", "34.67.18.167", "35.194.11.26", "34.67.205.167", "34.133.18.14"};
+		final String[] IP_ADDR = {"34.134.5.88", "34.67.172.122", "104.198.164.108",  "35.222.68.245", "34.70.147.244", "34.132.223.206", "34.135.39.150", "34.135.39.150"};
 		
 		final ManagedChannel[] channels = {
 			ManagedChannelBuilder.forAddress(IP_ADDR[0], 9090).usePlaintext().build(), 
@@ -150,7 +149,7 @@ public class GRPCClientService {
     }
 
 	public String multiply(double[][] m1, double[][] m2) {
-		final String[] IP_ADDR = {"35.222.9.50", "34.66.0.91", "35.238.180.188",  "34.69.186.132", "34.67.18.167", "35.194.11.26", "34.67.205.167", "34.133.18.14"};
+		final String[] IP_ADDR = {"34.134.5.88", "34.67.172.122", "104.198.164.108",  "35.222.68.245", "34.70.147.244", "34.132.223.206", "34.135.39.150", "34.135.39.150"};
 		
 		final ManagedChannel[] channels = {
 			ManagedChannelBuilder.forAddress(IP_ADDR[0], 9090).usePlaintext().build(), 
@@ -190,9 +189,8 @@ public class GRPCClientService {
 			int row = 0;
 
 			while(serverPtr < numOfServersRequired) {
-				requests[serverPtr].setStart(row);
-				requests[serverPtr].setEnd(row+numberOfRows);
-
+				requests[serverPtr].addRange(row);
+				requests[serverPtr].addRange(row+numberOfRows);
 				for (int i = row; i < row + numberOfRows; i++) {
 					Row.Builder tempRow = Row.newBuilder();
 					for (int col = 0; col < m1.length; col++) {
@@ -215,9 +213,10 @@ public class GRPCClientService {
 
 			MatrixReply[] replies = new MatrixReply[numOfServersRequired];
 
-			for(int i=0; i < replies.length; i++) {
+			for(int i = 0; i < replies.length; i++) {
 				replies[i] = stubs[i].parallelMatrixMultiplyBlock(requests[i].build());
 			}
+
 
 			for(int i=0; i < replies.length; i++) {
 				for(int j=0; j < replies[i].getCList().size(); j++) {
@@ -227,6 +226,7 @@ public class GRPCClientService {
 					resp += "<br>";
 				}
 			}
+
 		}
 		else {
 			int randomNumber = (int)(Math.random()*8);
@@ -247,9 +247,6 @@ public class GRPCClientService {
 				}
 				request.addB(tempRow);
 			}
-
-
-
 
 			MatrixReply C=stubs[randomNumber].multiplyBlock(request.build());
 			List<Row> arrayListC = C.getCList();

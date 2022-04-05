@@ -45,7 +45,6 @@ message MatrixReply {
 message MatrixMultParallelRequest {
   repeated Row a = 1;
   repeated Row b = 2;
-  int32 start = 3;
-  int32 end = 4;
+  repeated int32 range = 3;
 }
 
