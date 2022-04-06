@@ -80,7 +80,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 		MatrixReply.Builder c = MatrixReply.newBuilder();
 
 		// Temporary array for storing matrix
-		int[][] tempMatrix = new int[request.getRangeList().get(1) - request.getRangeList().get(0)][A.size()];
+		int[][] tempMatrix = new int[request.getRangeList().get(1) - request.getRangeList().get(0)][A.get(0).getNumberList().size()];
 
 		System.out.println(A);
 		System.out.println(B);
