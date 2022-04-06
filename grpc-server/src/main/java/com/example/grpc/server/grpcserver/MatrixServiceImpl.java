@@ -80,17 +80,15 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 		MatrixReply.Builder c = MatrixReply.newBuilder();
 
 		// Temporary array for storing matrix
-		int[][] tempMatrix = new int[request.getRangeList().get(1) - request.getRangeList().get(0)][A.get(0).getNumberList().size()];
+		Double[][] tempMatrix = new Double[request.getRangeList().get(1) - request.getRangeList().get(0)][A.get(0).getNumberList().size()];
 
 
 		for (int row = request.getRangeList().get(0); row < request.getRangeList().get(1); row++) {
-			System.out.println("Test 1");
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
-				System.out.println("Test 2");
 				for (int i = 0; i < A.get(row).getNumberList().size(); i++) {
 					System.out.println("Test 3");
-					System.out.println(B.get(row).getNumberList().size());
-					System.out.println(i);
+					System.out.println(String.valueOf(row) + "," + String.valueOf(i));
+					System.out.println(String.valueOf(i) + "," + String.valueOf(col));
 					Double firstNum = A.get(row).getNumber(i);
 					Double secondNum = B.get(i).getNumber(col);
 					tempMatrix[row][col] += firstNum * secondNum;
