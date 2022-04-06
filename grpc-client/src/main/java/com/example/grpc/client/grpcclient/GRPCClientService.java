@@ -33,7 +33,7 @@ public class GRPCClientService {
 		return helloResponse.getPong();
     }
     public String add(double[][] m1, double[][] m2){
-		final String[] IP_ADDR = {"34.134.5.88", "34.67.172.122", "104.198.164.108",  "35.222.68.245", "34.70.147.244", "34.132.223.206", "34.135.39.150", "34.135.39.150"};
+		final String[] IP_ADDR = {"35.225.5.122", "104.154.84.68", "35.222.88.202",  "35.239.190.80", "34.132.106.27", "34.67.75.244", "34.135.215.100", "146.148.76.192"};
 		
 		final ManagedChannel[] channels = {
 			ManagedChannelBuilder.forAddress(IP_ADDR[0], 9090).usePlaintext().build(), 
@@ -129,7 +129,7 @@ public class GRPCClientService {
 				request.addB(tempRow);
 			}
 
-
+			System.out.println(request.getAList());
 
 
 			MatrixReply C=stubs[randomNumber].addBlock(request.build());
@@ -149,7 +149,7 @@ public class GRPCClientService {
     }
 
 	public String multiply(double[][] m1, double[][] m2) {
-		final String[] IP_ADDR = {"34.134.5.88", "34.67.172.122", "104.198.164.108",  "35.222.68.245", "34.70.147.244", "34.132.223.206", "34.135.39.150", "34.135.39.150"};
+		final String[] IP_ADDR = {"35.225.5.122", "104.154.84.68", "35.222.88.202",  "35.239.190.80", "34.132.106.27", "34.67.75.244", "34.135.215.100", "146.148.76.192"};
 		
 		final ManagedChannel[] channels = {
 			ManagedChannelBuilder.forAddress(IP_ADDR[0], 9090).usePlaintext().build(), 
@@ -208,8 +208,10 @@ public class GRPCClientService {
 				}
 
 				row += numberOfRows;
+				System.out.println(requests[serverPtr]);
 				serverPtr += 1;
 			}
+
 
 			MatrixReply[] replies = new MatrixReply[numOfServersRequired];
 
