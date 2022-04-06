@@ -82,11 +82,10 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 		// Temporary array for storing matrix
 		int[][] tempMatrix = new int[request.getRangeList().get(1) - request.getRangeList().get(0)][A.size()];
 
-		System.out.println(A.size());
-		System.out.println(B.size());
+		System.out.println(A);
+		System.out.println(B);
 
 		for (int row = request.getRangeList().get(0); row < request.getRangeList().get(1); row++) {
-			System.out.println(A.get(row).getNumberList());
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
 				for (int i = 0; i < A.get(row).getNumberList().size(); i++) {
 					Double firstNum = A.get(row).getNumber(i);
