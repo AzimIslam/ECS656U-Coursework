@@ -89,7 +89,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 				System.out.println("Test 2");
 				for (int i = 0; i < A.get(row).getNumberList().size(); i++) {
 					System.out.println("Test 3");
-					System.out.println(A.get(row).getNumber(i));
+					System.out.println(B.get(row).getNumberList().size());
 					System.out.println(i);
 					Double firstNum = A.get(row).getNumber(i);
 					Double secondNum = B.get(i).getNumber(col);
