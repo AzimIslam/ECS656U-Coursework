@@ -44,7 +44,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 		MatrixReply.Builder c = MatrixReply.newBuilder();
 
 		// Temporary array for storing matrix
-		int[][] tempMatrix = new int[A.size()][A.size()];
+		Double[][] tempMatrix = new Double[A.size()][A.size()];
 
 		for (int row = 0; row < A.size(); row++) {
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
@@ -82,15 +82,16 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 		// Temporary array for storing matrix
 		Double[][] tempMatrix = new Double[request.getRangeList().get(1) - request.getRangeList().get(0)][A.get(0).getNumberList().size()];
 
+		// Set values to zero of temporary array
+		for (int i = 0; i < tempMatrix.length; i++) {
+			for (int j = 0; j < tempMatrix[i].length; j++) {
+				tempMatrix[i][j] = 0.0;
+			}
+		}
 
-		System.out.println(A.get(0).getNumber(0));
-		System.out.println(B.get(0).getNumber(0));
 		for (int row = request.getRangeList().get(0); row < request.getRangeList().get(1); row++) {
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
 				for (int i = 0; i < A.get(row).getNumberList().size(); i++) {
-					System.out.println("Test 3");
-					System.out.println(String.valueOf(row) + "," + String.valueOf(i));
-					System.out.println(String.valueOf(i) + "," + String.valueOf(col));
 					Double firstNum = A.get(row).getNumber(i);
 					Double secondNum = B.get(i).getNumber(col);
 					tempMatrix[row][col] += firstNum * secondNum;
