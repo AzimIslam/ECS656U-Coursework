@@ -97,6 +97,7 @@ public class PingPongEndpoint {
 					A[row][col] = Double.parseDouble(rowMatrix1[col]);
 					B[row][col] = Double.parseDouble(rowMatrix2[col]);
 				}
+				
 
 				row += 1;
 			}

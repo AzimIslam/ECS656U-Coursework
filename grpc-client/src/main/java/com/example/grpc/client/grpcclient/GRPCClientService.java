@@ -33,7 +33,7 @@ public class GRPCClientService {
 		return helloResponse.getPong();
     }
     public String add(double[][] m1, double[][] m2){
-		final String[] IP_ADDR = {"35.225.5.122", "104.154.84.68", "35.222.88.202",  "35.239.190.80", "34.132.106.27", "34.67.75.244", "34.135.215.100", "146.148.76.192"};
+		final String[] IP_ADDR = {"35.224.36.36", "34.135.118.75", "35.225.249.142",  "34.123.163.45", "34.123.200.106", "35.222.69.89", "34.66.62.10", "34.72.67.235"};
 		
 		final ManagedChannel[] channels = {
 			ManagedChannelBuilder.forAddress(IP_ADDR[0], 9090).usePlaintext().build(), 
@@ -149,7 +149,7 @@ public class GRPCClientService {
     }
 
 	public String multiply(double[][] m1, double[][] m2) {
-		final String[] IP_ADDR = {"35.225.5.122", "104.154.84.68", "35.222.88.202",  "35.239.190.80", "34.132.106.27", "34.67.75.244", "34.135.215.100", "146.148.76.192"};
+		final String[] IP_ADDR = {"35.224.36.36", "34.135.118.75", "35.225.249.142",  "34.123.163.45", "34.123.200.106", "35.222.69.89", "34.66.62.10", "34.72.67.235"};
 		
 		final ManagedChannel[] channels = {
 			ManagedChannelBuilder.forAddress(IP_ADDR[0], 9090).usePlaintext().build(), 
@@ -191,24 +191,23 @@ public class GRPCClientService {
 			while(serverPtr < numOfServersRequired) {
 				requests[serverPtr].addRange(row);
 				requests[serverPtr].addRange(row+numberOfRows);
-				for (int i = row; i < row + numberOfRows; i++) {
+				for (int i = 0; i < m1.length; i++) {
 					Row.Builder tempRow = Row.newBuilder();
-					for (int col = 0; col < m1.length; col++) {
+					for (int col = 0; col < m1[i].length; col++) {
 						tempRow.addNumber(m1[i][col]);
 					}
 					requests[serverPtr].addA(tempRow);
 				}
 
-				for (int i = row; i < row + numberOfRows; i++) {
+				for (int i = 0; i < m2.length; i++) {
 					Row.Builder tempRow2 = Row.newBuilder();
-					for (int col = 0; col < m2.length; col++) {
+					for (int col = 0; col < m2[i].length; col++) {
 						tempRow2.addNumber(m2[i][col]);
 					}
 					requests[serverPtr].addB(tempRow2);
 				}
 
 				row += numberOfRows;
-				System.out.println(requests[serverPtr]);
 				serverPtr += 1;
 			}
 
