@@ -90,6 +90,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 		}
 
 		for (int row = request.getRangeList().get(0); row < request.getRangeList().get(1); row++) {
+			System.out.println(A.get(row).getNumberList().size());
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
 				System.out.println(String.valueOf(row) + "," + String.valueOf(col));
 				Double firstNum = A.get(row).getNumber(col);
