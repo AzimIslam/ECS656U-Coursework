@@ -196,7 +196,7 @@ public class GRPCClientService {
 					for (int col = 0; col < m1[row].length; col++) {
 						tempRow.addNumber(m1[row][col]);
 					}
-					requests[row].addA(tempRow);
+					requests[serverPtr].addA(tempRow);
 				}
 	
 				for (int row = 0; row < m2.length; row++) {
@@ -204,7 +204,7 @@ public class GRPCClientService {
 					for (int col = 0; col < m2[row].length; col++) {
 						tempRow.addNumber(m2[row][col]);
 					}
-					requests[row].addB(tempRow);
+					requests[serverPtr].addB(tempRow);
 				}
 
 				serverRow += numberOfRows;
