@@ -91,17 +91,27 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 
 		for (int row = request.getRangeList().get(0); row < request.getRangeList().get(1); row++) {
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
-				for (int i = 0; i < A.get(row).getNumberList().size(); i++) {
-					System.out.println(A.get(row).getNumberList().size());
+				System.out.println(String.valueOf(row) + "," + String.valueOf(col));
+				Double firstNum = A.get(row).getNumber(col);
 
+				System.out.println(String.valueOf(col) + "," + String.valueOf(row));
+				Double secondNum = A.get(col).getNumber(row);
+
+				tempMatrix[row][col] += firstNum * secondNum;
+				/*
+				for (int i = 0; i < A.get(row).getNumberList().size(); i++) {
 					System.out.println(String.valueOf(row) + "," + String.valueOf(i));
 					Double firstNum = A.get(row).getNumber(i);
 
+
+					// (1, 0)
+					// (0, 0)
 					System.out.println(String.valueOf(i) + "," + String.valueOf(col));
 					Double secondNum = B.get(i).getNumber(col);
 
 					tempMatrix[row][col] += firstNum * secondNum;
 				}
+				*/
 			}
 		}
 
@@ -119,3 +129,35 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 		reply.onCompleted();
 	}		
 }
+
+
+
+// (1, 0)
+// (0, 1)
+
+// Select row start and row < end
+// Get firstNum = A[row][col]
+// Get secondNum = A[col][row]
+
+
+
+/*
+[1, 2, 3, 4]
+->  [1, 2, 3, 4]
+[1, 2, 3, 4]
+[1, 2, 3, 4]
+
+
+[1, 2, 3, 4]
+->  [1, 2, 3, 4]
+[1, 2, 3, 4]
+[1, 2, 3, 4]
+
+C[0] = (1*1) + (2*1) + (3*1) + (4*1)
+C[1] = (1*2) + (2*2) + (3*2) + (4*2)
+C[2] = (1*3) + (2*3) + (3*3) + (4*3)
+C[3] = (1*4) + (2*4) + (3*4) + (4*4)
+
+
+
+range = 1, 2*/
