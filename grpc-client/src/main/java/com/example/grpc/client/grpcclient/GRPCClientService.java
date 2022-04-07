@@ -186,28 +186,26 @@ public class GRPCClientService {
 			}
 
 			int serverPtr = 0;
-			int row = 0;
 
 			while(serverPtr < numOfServersRequired) {
 				requests[serverPtr].addRange(row);
 				requests[serverPtr].addRange(row+numberOfRows);
-				for (int i = 0; i < m1.length; i++) {
+				for (int row = 0; row < m1.length; row++) {
 					Row.Builder tempRow = Row.newBuilder();
-					for (int col = 0; col < m1[i].length; col++) {
-						tempRow.addNumber(m1[i][col]);
+					for (int col = 0; col < m1[row].length; col++) {
+						tempRow.addNumber(m1[row][col]);
 					}
-					requests[serverPtr].addA(tempRow);
+					requests[row].addA(tempRow);
+				}
+	
+				for (int row = 0; row < m2.length; row++) {
+					Row.Builder tempRow = Row.newBuilder();
+					for (int col = 0; col < m2[row].length; col++) {
+						tempRow.addNumber(m2[row][col]);
+					}
+					requests[row].addB(tempRow);
 				}
 
-				for (int i = 0; i < m2.length; i++) {
-					Row.Builder tempRow2 = Row.newBuilder();
-					for (int col = 0; col < m2[i].length; col++) {
-						tempRow2.addNumber(m2[i][col]);
-					}
-					requests[serverPtr].addB(tempRow2);
-				}
-
-				row += numberOfRows;
 				serverPtr += 1;
 			}
 

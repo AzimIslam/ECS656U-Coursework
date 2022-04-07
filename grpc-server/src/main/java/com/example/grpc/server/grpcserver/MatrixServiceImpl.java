@@ -95,7 +95,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 				for (int i = 0; i < A.get(row).getNumberList().size(); i++) {
 					Double firstNum = A.get(row).getNumber(i);
 					Double secondNum = B.get(i).getNumber(col);
-					System.out.println("Help")
+					System.out.println("Help");
 					tempMatrix[row][col] += firstNum * secondNum;
 				}
 			}
