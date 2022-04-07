@@ -89,6 +89,8 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 			}
 		}
 
+		System.out.println(A.size());
+		System.out.println(B.size());
 
 		for (int row = request.getRangeList().get(0); row < request.getRangeList().get(1); row++) {
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
@@ -98,7 +100,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 
 					System.out.println(String.valueOf(i) + "," + String.valueOf(col));
 					Double secondNum = B.get(i).getNumber(col);
-					
+
 					tempMatrix[row][col] += firstNum * secondNum;
 				}
 			}
