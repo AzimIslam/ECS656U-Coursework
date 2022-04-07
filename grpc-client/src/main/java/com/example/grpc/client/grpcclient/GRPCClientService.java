@@ -186,10 +186,11 @@ public class GRPCClientService {
 			}
 
 			int serverPtr = 0;
+			int serverRow = 0;
 
 			while(serverPtr < numOfServersRequired) {
-				requests[serverPtr].addRange(row);
-				requests[serverPtr].addRange(row+numberOfRows);
+				requests[serverPtr].addRange(serverRow);
+				requests[serverPtr].addRange(serverRow+numberOfRows);
 				for (int row = 0; row < m1.length; row++) {
 					Row.Builder tempRow = Row.newBuilder();
 					for (int col = 0; col < m1[row].length; col++) {
@@ -206,6 +207,7 @@ public class GRPCClientService {
 					requests[row].addB(tempRow);
 				}
 
+				serverRow += numberOfRows;
 				serverPtr += 1;
 			}
 
