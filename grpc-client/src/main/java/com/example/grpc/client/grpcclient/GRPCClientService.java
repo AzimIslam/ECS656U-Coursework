@@ -1,6 +1,5 @@
 package com.example.grpc.client.grpcclient;
 
-import java.util.List;
 import java.util.*;
 
 import com.example.grpc.server.grpcserver.MatrixMultParallelRequest;
@@ -11,6 +10,7 @@ import com.example.grpc.server.grpcserver.PingPongServiceGrpc;
 import com.example.grpc.server.grpcserver.PingRequest;
 import com.example.grpc.server.grpcserver.PongResponse;
 import com.example.grpc.server.grpcserver.Row;
+import com.example.grpc.server.grpcserver.MatrixServiceGrpc.MatrixServiceBlockingStub;
 
 import org.springframework.stereotype.Service;
 
@@ -39,6 +39,11 @@ public class GRPCClientService {
 		channel.shutdown();        
 		return helloResponse.getPong();
     }
+
+	public boolean checkLocks(int[] locks) {
+		return locks[0] != 0;
+	}
+
     public String add(double[][] m1, double[][] m2){
 		final String[] IP_ADDR = {"34.132.180.67", "34.66.112.58", "104.154.23.30",  "104.154.128.69", "35.188.26.202", "104.154.156.149", "35.239.214.67", "34.67.187.208"};
 		
@@ -68,11 +73,12 @@ public class GRPCClientService {
 
 
 		if (m1.length > 2) {
-			List<Row> C = new ArrayList<Row>();
-
-
 			int numOfServersRequired = m1.length == 4 ? 4: 8;
-			int numberOfRows = m1.length / numOfServersRequired ;
+			int numberOfRows = m1.length / numOfServersRequired;
+
+			Double[][] C = new Double[numOfServersRequired][numOfServersRequired];
+
+			int[] locks = new int[]{numOfServersRequired};
 
 
 			StreamObserver<MatrixReply> MatrixCallback = new StreamObserver<MatrixReply>() {
@@ -81,8 +87,11 @@ public class GRPCClientService {
 					System.out.println("Received matrix: " +  value);
 					List<Row> matrix = value.getCList();
 					for (int row = 0; row < matrix.size(); row++) {
-						C.add(matrix.get(row));
+						for (int col = 0; col < matrix.get(row).getNumberList().size(); col ++) {
+							C[matrix.get(row).getPosition()-1][col] = matrix.get(row).getNumber(col);
+						}
 					}
+					locks[0] -= 1;
 				}
 			
 				@Override
@@ -111,7 +120,7 @@ public class GRPCClientService {
 					for (int col = 0; col < m1.length; col++) {
 						tempRow.addNumber(m1[i][col]);
 					}
-					tempRow.setPosition(i);
+					tempRow.setPosition(i+1);
 					requests[serverPtr].addA(tempRow);
 				}
 
@@ -120,6 +129,7 @@ public class GRPCClientService {
 					for (int col = 0; col < m2.length; col++) {
 						tempRow2.addNumber(m2[i][col]);
 					}
+					tempRow2.setPosition(i+1);
 					requests[serverPtr].addB(tempRow2);
 				}
 
@@ -127,13 +137,12 @@ public class GRPCClientService {
 				serverPtr += 1;
 			}
 
-			for(int i=0; i < stubs.length; i++) {
+			for(int i=0; i < numOfServersRequired; i++) {
 				stubs[i].addBlock(requests[i].build(), MatrixCallback);
 			}
 
-			System.out.println(C.size());
 
-			while(C.size() != m1.length) {
+			while(checkLocks(locks)) {
 				try {
 					TimeUnit.MILLISECONDS.sleep(1000);
 				} catch (InterruptedException e) {
@@ -141,21 +150,17 @@ public class GRPCClientService {
 				}
 			}
 
-			System.out.println(C.size());
-
-			for (int i = 0; i < C.size();i++) {
-				System.out.println(C.get(i));
-				for (int j = 0; j < C.size(); j++) {
-					resp += C.get(i).getNumber(j) + " ";
+			for (int i = 0; i < C.length;i++) {
+				for (int j = 0; j < C[i].length; j++) {
+					resp += C[i][j] + " ";
 				}
 				resp += "<br>";
 			}
-
-			System.out.println(resp);
-
 		} else {
-			/*
 			int randomNumber = (int)(Math.random()*8);
+			ManagedChannel channel = ManagedChannelBuilder.forAddress(IP_ADDR[randomNumber], 9090).usePlaintext().build();
+
+			MatrixServiceGrpc.MatrixServiceBlockingStub stub = MatrixServiceGrpc.newBlockingStub(channel);
 
 			MatrixRequest.Builder request = MatrixRequest.newBuilder();
 
@@ -178,7 +183,7 @@ public class GRPCClientService {
 			System.out.println(request.getAList());
 
 
-			MatrixReply C=stubs[randomNumber].addBlock(request.build());
+			MatrixReply C=stub.addBlock(request.build());
 			List<Row> arrayListC = C.getCList();
 
 			// Iterates over result matrix
@@ -188,7 +193,6 @@ public class GRPCClientService {
 				}
 				resp += "<br>";
 			}
-			*/
 		}
 
 		return resp;
