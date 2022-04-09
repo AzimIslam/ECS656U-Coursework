@@ -28,6 +28,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 				Double secondNum = B.get(row).getNumber(col);
 				tempRow.addNumber(firstNum + secondNum);
 			};
+			tempRow.setPosition(A.get(row).getPosition());
 			c.addC(tempRow);
 		}
 		MatrixReply response = c.build();

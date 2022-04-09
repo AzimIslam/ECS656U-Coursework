@@ -1,6 +1,7 @@
 package com.example.grpc.client.grpcclient;
 
 import java.util.List;
+import java.util.*;
 
 import com.example.grpc.server.grpcserver.MatrixMultParallelRequest;
 import com.example.grpc.server.grpcserver.MatrixReply;
@@ -15,6 +16,12 @@ import org.springframework.stereotype.Service;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.StreamObserver;
+import java.util.concurrent.*;
+
+
+
+
 
 @Service
 public class GRPCClientService {
@@ -33,7 +40,7 @@ public class GRPCClientService {
 		return helloResponse.getPong();
     }
     public String add(double[][] m1, double[][] m2){
-		final String[] IP_ADDR = {"35.224.36.36", "34.135.118.75", "35.225.249.142",  "34.123.163.45", "34.123.200.106", "35.222.69.89", "34.66.62.10", "34.72.67.235"};
+		final String[] IP_ADDR = {"34.132.180.67", "34.66.112.58", "104.154.23.30",  "104.154.128.69", "35.188.26.202", "104.154.156.149", "35.239.214.67", "34.67.187.208"};
 		
 		final ManagedChannel[] channels = {
 			ManagedChannelBuilder.forAddress(IP_ADDR[0], 9090).usePlaintext().build(), 
@@ -46,22 +53,48 @@ public class GRPCClientService {
 			ManagedChannelBuilder.forAddress(IP_ADDR[7], 9090).usePlaintext().build()
 		};
 
-		final MatrixServiceGrpc.MatrixServiceBlockingStub[] stubs = {
-			MatrixServiceGrpc.newBlockingStub(channels[0]),
-			MatrixServiceGrpc.newBlockingStub(channels[1]),
-			MatrixServiceGrpc.newBlockingStub(channels[2]),
-			MatrixServiceGrpc.newBlockingStub(channels[3]),
-			MatrixServiceGrpc.newBlockingStub(channels[4]),
-			MatrixServiceGrpc.newBlockingStub(channels[5]),
-			MatrixServiceGrpc.newBlockingStub(channels[6]),
-			MatrixServiceGrpc.newBlockingStub(channels[7]),
+		final MatrixServiceGrpc.MatrixServiceStub[] stubs = {
+			MatrixServiceGrpc.newStub(channels[0]),
+			MatrixServiceGrpc.newStub(channels[1]),
+			MatrixServiceGrpc.newStub(channels[2]),
+			MatrixServiceGrpc.newStub(channels[3]),
+			MatrixServiceGrpc.newStub(channels[4]),
+			MatrixServiceGrpc.newStub(channels[5]),
+			MatrixServiceGrpc.newStub(channels[6]),
+			MatrixServiceGrpc.newStub(channels[7]),
 		};
 
-		String resp="";
+		String resp = "";
+
 
 		if (m1.length > 2) {
+			List<Row> C = new ArrayList<Row>();
+
+
 			int numOfServersRequired = m1.length == 4 ? 4: 8;
 			int numberOfRows = m1.length / numOfServersRequired ;
+
+
+			StreamObserver<MatrixReply> MatrixCallback = new StreamObserver<MatrixReply>() {
+				@Override
+				public void onNext(MatrixReply value) {
+					System.out.println("Received matrix: " +  value);
+					List<Row> matrix = value.getCList();
+					for (int row = 0; row < matrix.size(); row++) {
+						C.add(matrix.get(row));
+					}
+				}
+			
+				@Override
+				public void onError(Throwable cause) {
+					System.out.println("Error occurred: " +  cause.getMessage());
+				}
+			
+				@Override
+				public void onCompleted() {
+					System.out.println("Stream complete!");
+				}
+			};
 
 			MatrixRequest.Builder[] requests = new MatrixRequest.Builder[numOfServersRequired];
 
@@ -78,6 +111,7 @@ public class GRPCClientService {
 					for (int col = 0; col < m1.length; col++) {
 						tempRow.addNumber(m1[i][col]);
 					}
+					tempRow.setPosition(i);
 					requests[serverPtr].addA(tempRow);
 				}
 
@@ -93,22 +127,34 @@ public class GRPCClientService {
 				serverPtr += 1;
 			}
 
-			MatrixReply[] replies = new MatrixReply[numOfServersRequired];
-
-			for(int i=0; i < replies.length; i++) {
-				replies[i] = stubs[i].addBlock(requests[i].build());
+			for(int i=0; i < stubs.length; i++) {
+				stubs[i].addBlock(requests[i].build(), MatrixCallback);
 			}
 
-			for(int i=0; i < replies.length; i++) {
-				for(int j=0; j < replies[i].getCList().size(); j++) {
-					for (int k=0; k < replies[i].getCList().get(j).getNumberList().size(); k++) {
-						resp += replies[i].getCList().get(j).getNumber(k) + " ";
-					}
-					resp += "<br>";
+			System.out.println(C.size());
+
+			while(C.size() != m1.length) {
+				try {
+					TimeUnit.MILLISECONDS.sleep(1000);
+				} catch (InterruptedException e) {
+					System.out.println(e);
 				}
 			}
 
+			System.out.println(C.size());
+
+			for (int i = 0; i < C.size();i++) {
+				System.out.println(C.get(i));
+				for (int j = 0; j < C.size(); j++) {
+					resp += C.get(i).getNumber(j) + " ";
+				}
+				resp += "<br>";
+			}
+
+			System.out.println(resp);
+
 		} else {
+			/*
 			int randomNumber = (int)(Math.random()*8);
 
 			MatrixRequest.Builder request = MatrixRequest.newBuilder();
@@ -142,6 +188,7 @@ public class GRPCClientService {
 				}
 				resp += "<br>";
 			}
+			*/
 		}
 
 		return resp;
@@ -149,8 +196,7 @@ public class GRPCClientService {
     }
 
 	public String multiply(double[][] m1, double[][] m2) {
-		final String[] IP_ADDR = {"35.224.36.36", "34.135.118.75", "35.225.249.142",  "34.123.163.45", "34.123.200.106", "35.222.69.89", "34.66.62.10", "34.72.67.235"};
-		
+		final String[] IP_ADDR = {"34.132.180.67", "34.66.112.58", "104.154.23.30",  "104.154.128.69", "35.188.26.202", "104.154.156.149", "35.239.214.67", "34.67.187.208"};		
 		final ManagedChannel[] channels = {
 			ManagedChannelBuilder.forAddress(IP_ADDR[0], 9090).usePlaintext().build(), 
 			ManagedChannelBuilder.forAddress(IP_ADDR[1], 9090).usePlaintext().build(),
