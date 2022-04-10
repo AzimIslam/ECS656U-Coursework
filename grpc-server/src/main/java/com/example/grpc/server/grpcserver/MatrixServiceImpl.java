@@ -108,6 +108,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 			for (int col = 0; col < tempMatrix[row].length; col++) {
 				tempRow.addNumber(tempMatrix[row][col]);
 			}
+			tempRow.setPosition(A.get(row).getPosition());
 			c.addC(tempRow);
 		}
 
