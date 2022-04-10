@@ -41,6 +41,8 @@ public class GRPCClientService {
     }
 
 	public boolean checkLocks(int[] locks) {
+		if (locks[0] != 0) System.out.println("Waiting for " + String.valueOf(locks[0]) + " servers to complete...");
+		else System.out.println("All servers have completed their operations");
 		return locks[0] != 0;
 	}
 
@@ -76,7 +78,8 @@ public class GRPCClientService {
 			int numOfServersRequired = m1.length == 4 ? 4: 8;
 			int numberOfRows = m1.length / numOfServersRequired;
 
-			Double[][] C = new Double[numOfServersRequired][numOfServersRequired];
+
+			String[] responses = new String[numOfServersRequired];
 
 			int[] locks = new int[]{numOfServersRequired};
 
@@ -84,24 +87,19 @@ public class GRPCClientService {
 			StreamObserver<MatrixReply> MatrixCallback = new StreamObserver<MatrixReply>() {
 				@Override
 				public void onNext(MatrixReply value) {
-					System.out.println("Received matrix: " +  value);
-					List<Row> matrix = value.getCList();
-					for (int row = 0; row < matrix.size(); row++) {
-						for (int col = 0; col < matrix.get(row).getNumberList().size(); col ++) {
-							C[matrix.get(row).getPosition()-1][col] = matrix.get(row).getNumber(col);
-						}
-					}
+					String matrix = value.getC();
+					responses[value.getPosition()-1] = matrix;
 					locks[0] -= 1;
 				}
 			
 				@Override
 				public void onError(Throwable cause) {
-					System.out.println("Error occurred: " +  cause.getMessage());
+					System.out.println("Error occurred: " +  cause.toString());
 				}
 			
 				@Override
 				public void onCompleted() {
-					System.out.println("Stream complete!");
+					System.out.println("A server has completed adding " + String.valueOf(numberOfRows) +  " rows");
 				}
 			};
 
@@ -120,7 +118,6 @@ public class GRPCClientService {
 					for (int col = 0; col < m1.length; col++) {
 						tempRow.addNumber(m1[i][col]);
 					}
-					tempRow.setPosition(i+1);
 					requests[serverPtr].addA(tempRow);
 				}
 
@@ -129,9 +126,10 @@ public class GRPCClientService {
 					for (int col = 0; col < m2.length; col++) {
 						tempRow2.addNumber(m2[i][col]);
 					}
-					tempRow2.setPosition(i+1);
 					requests[serverPtr].addB(tempRow2);
 				}
+
+				requests[serverPtr].setPosition(serverPtr + 1);
 
 				row += numberOfRows;
 				serverPtr += 1;
@@ -150,18 +148,17 @@ public class GRPCClientService {
 				}
 			}
 
-			for (int i = 0; i < C.length;i++) {
-				for (int j = 0; j < C[i].length; j++) {
-					resp += C[i][j] + " ";
-				}
-				resp += "<br>";
+			for (int i = 0; i < responses.length; i++) {
+				resp += responses[i];
 			}
+
 		} else {
 			int randomNumber = (int)(Math.random()*8);
 			ManagedChannel channel = ManagedChannelBuilder.forAddress(IP_ADDR[randomNumber], 9090).usePlaintext().build();
 
 			MatrixServiceGrpc.MatrixServiceBlockingStub stub = MatrixServiceGrpc.newBlockingStub(channel);
 
+			
 			MatrixRequest.Builder request = MatrixRequest.newBuilder();
 
 			for (int row = 0; row < m1.length; row++) {
@@ -184,15 +181,8 @@ public class GRPCClientService {
 
 
 			MatrixReply C=stub.addBlock(request.build());
-			List<Row> arrayListC = C.getCList();
 
-			// Iterates over result matrix
-			for (int row = 0; row < arrayListC.size(); row++) {
-				for (int col = 0; col < arrayListC.get(row).getNumberList().size(); col++) {
-					resp += arrayListC.get(row).getNumber(col) + " ";
-				}
-				resp += "<br>";
-			}
+			resp = C.getC();
 		}
 
 		return resp;
@@ -212,15 +202,15 @@ public class GRPCClientService {
 			ManagedChannelBuilder.forAddress(IP_ADDR[7], 9090).usePlaintext().build()
 		};
 
-		final MatrixServiceGrpc.MatrixServiceBlockingStub[] stubs = {
-			MatrixServiceGrpc.newBlockingStub(channels[0]),
-			MatrixServiceGrpc.newBlockingStub(channels[1]),
-			MatrixServiceGrpc.newBlockingStub(channels[2]),
-			MatrixServiceGrpc.newBlockingStub(channels[3]),
-			MatrixServiceGrpc.newBlockingStub(channels[4]),
-			MatrixServiceGrpc.newBlockingStub(channels[5]),
-			MatrixServiceGrpc.newBlockingStub(channels[6]),
-			MatrixServiceGrpc.newBlockingStub(channels[7]),
+		final MatrixServiceGrpc.MatrixServiceStub[] stubs = {
+			MatrixServiceGrpc.newStub(channels[0]),
+			MatrixServiceGrpc.newStub(channels[1]),
+			MatrixServiceGrpc.newStub(channels[2]),
+			MatrixServiceGrpc.newStub(channels[3]),
+			MatrixServiceGrpc.newStub(channels[4]),
+			MatrixServiceGrpc.newStub(channels[5]),
+			MatrixServiceGrpc.newStub(channels[6]),
+			MatrixServiceGrpc.newStub(channels[7]),
 		};
 
 		String resp="";
@@ -228,6 +218,29 @@ public class GRPCClientService {
 		if (m1.length > 2) {
 			int numOfServersRequired = m1.length == 4 ? 4: 8;
 			int numberOfRows = m1.length / numOfServersRequired;
+
+			String[] responses = new String[numOfServersRequired];
+
+			int[] locks = new int[]{numOfServersRequired};
+
+			StreamObserver<MatrixReply> MatrixCallback = new StreamObserver<MatrixReply>() {
+				@Override
+				public void onNext(MatrixReply value) {
+					String matrix = value.getC();
+					responses[value.getPosition()-1] = matrix;
+					locks[0] -= 1;
+				}
+			
+				@Override
+				public void onError(Throwable cause) {
+					System.out.println("Error occurred: " +  cause.toString());
+				}
+			
+				@Override
+				public void onCompleted() {
+					System.out.println("A server has completed adding " + String.valueOf(numberOfRows) +  " rows");
+				}
+			};
 
 			MatrixMultParallelRequest.Builder[] requests = new MatrixMultParallelRequest.Builder[numOfServersRequired];
 
@@ -257,31 +270,36 @@ public class GRPCClientService {
 					requests[serverPtr].addB(tempRow);
 				}
 
+				requests[serverPtr].setPosition(serverPtr+1);
+
 				serverRow += numberOfRows;
 				serverPtr += 1;
 			}
 
-
-			MatrixReply[] replies = new MatrixReply[numOfServersRequired];
-
-			for(int i = 0; i < replies.length; i++) {
-				replies[i] = stubs[i].parallelMatrixMultiplyBlock(requests[i].build());
+			for(int i = 0; i < stubs.length; i++) {
+				stubs[i].parallelMatrixMultiplyBlock(requests[i].build(), MatrixCallback);
 			}
 
-
-			for(int i=0; i < replies.length; i++) {
-				for(int j=0; j < replies[i].getCList().size(); j++) {
-					for (int k=0; k < replies[i].getCList().get(j).getNumberList().size(); k++) {
-						resp += replies[i].getCList().get(j).getNumber(k) + " ";
-					}
-					resp += "<br>";
+			while(checkLocks(locks)) {
+				try {
+					TimeUnit.MILLISECONDS.sleep(1000);
+				} catch (InterruptedException e) {
+					System.out.println(e);
 				}
+			}
+
+			for (int i = 0; i < responses.length; i++) {
+				resp += responses[i];
 			}
 
 		}
 		else {
 			int randomNumber = (int)(Math.random()*8);
+			ManagedChannel channel = ManagedChannelBuilder.forAddress(IP_ADDR[randomNumber], 9090).usePlaintext().build();
+
 			MatrixRequest.Builder request = MatrixRequest.newBuilder();
+
+			MatrixServiceGrpc.MatrixServiceBlockingStub stub = MatrixServiceGrpc.newBlockingStub(channel);
 
 			for (int row = 0; row < m1.length; row++) {
 				Row.Builder tempRow = Row.newBuilder();
@@ -299,15 +317,9 @@ public class GRPCClientService {
 				request.addB(tempRow);
 			}
 
-			MatrixReply C=stubs[randomNumber].multiplyBlock(request.build());
-			List<Row> arrayListC = C.getCList();
+			MatrixReply C=stub.multiplyBlock(request.build());
 
-			for (int row = 0; row < arrayListC.size(); row++) {
-				for (int col = 0; col < arrayListC.get(row).getNumberList().size(); col++) {
-					resp += arrayListC.get(row).getNumber(col) + " ";
-				}
-				resp += "<br>";
-			}
+			resp = C.getC();
 		}
 		
 
