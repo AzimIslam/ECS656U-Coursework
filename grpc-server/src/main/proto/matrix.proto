@@ -31,21 +31,23 @@ service MatrixService{
 message MatrixRequest {
   repeated Row a = 1;
   repeated Row b = 2;
+  int32 position = 3;
 }
 
 message Row {
   repeated double number = 1;
-  int32 position = 2;
 }
 
 // The response message containing the result marix
 message MatrixReply {
-  repeated Row c = 1;
+  string c = 1;
+  int32 position = 2;
 }
 
 message MatrixMultParallelRequest {
   repeated Row a = 1;
   repeated Row b = 2;
   repeated int32 range = 3;
+  int32 position = 4;
 }
 

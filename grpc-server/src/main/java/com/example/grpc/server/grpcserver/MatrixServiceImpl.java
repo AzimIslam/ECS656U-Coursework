@@ -16,22 +16,28 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 	public void addBlock(MatrixRequest request, StreamObserver<MatrixReply> reply)
 	{
 		System.out.println("Request received from client:\n" + request);
+
+		String stringReply = "";
+
 		List<Row> A = request.getAList();
 		List<Row> B = request.getBList();
 
 		MatrixReply.Builder c = MatrixReply.newBuilder();
 
 		for (int row = 0; row < A.size(); row++) {
-			Row.Builder tempRow = Row.newBuilder();
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
 				Double firstNum = A.get(row).getNumber(col);
 				Double secondNum = B.get(row).getNumber(col);
-				tempRow.addNumber(firstNum + secondNum);
+				stringReply += String.valueOf(firstNum + secondNum) + " ";
 			};
-			tempRow.setPosition(A.get(row).getPosition());
-			c.addC(tempRow);
+			stringReply += "<br>";
 		}
+
+		c.setC(stringReply);
+		c.setPosition(request.getPosition());
+
 		MatrixReply response = c.build();
+
 		reply.onNext(response);
 		reply.onCompleted();
 	}
@@ -39,6 +45,8 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 	public void multiplyBlock(MatrixRequest request, StreamObserver<MatrixReply> reply)
 	{
 		System.out.println("Request received from client:\n" + request);
+
+		String stringReply = "";
 
 		List<Row> A = request.getAList();
 		List<Row> B = request.getBList();
@@ -60,13 +68,13 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 
 		// Creates the Matrix Reply based on the temporary array
 		for (int row = 0; row < tempMatrix.length; row++) {
-			Row.Builder tempRow = Row.newBuilder();
 			for (int col = 0; col < tempMatrix[row].length; col++) {
-				tempRow.addNumber(tempMatrix[row][col]);
+				stringReply += tempMatrix[row][col] + " ";
 			}
-			c.addC(tempRow);
+			stringReply += "<br>";
 		}
 
+		c.setC(stringReply);
 		MatrixReply response = c.build();
 		reply.onNext(response);
 		reply.onCompleted();
@@ -76,6 +84,8 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 	public void parallelMatrixMultiplyBlock(MatrixMultParallelRequest request, StreamObserver<MatrixReply> reply) {
 		System.out.println("Request received from client:\n" + request);
 
+		String stringReply = "";
+
 		List<Row> A = request.getAList();
 		List<Row> B = request.getBList();
 
@@ -84,19 +94,12 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 		// Temporary array for storing matrix
 		Double[][] tempMatrix = new Double[request.getRangeList().get(1) - request.getRangeList().get(0)][A.get(0).getNumberList().size()];
 
-		// Set values to zero of temporary array
-		for (int i = 0; i < tempMatrix.length; i++) {
-			for (int j = 0; j < tempMatrix[i].length; j++) {
-				tempMatrix[i][j] = 0.0;
-			}
-		}
 
 		for (int row = request.getRangeList().get(0); row < request.getRangeList().get(1); row++) {
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
 				for (int i = 0; i < A.get(row).getNumberList().size(); i++) {
 					Double firstNum = A.get(row).getNumber(i);
 					Double secondNum = B.get(i).getNumber(col);
-
 					tempMatrix[Math.abs(row - request.getRangeList().get(0))][col] += firstNum * secondNum;
 				}
 			}
@@ -104,13 +107,14 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 
 		// Creates the Matrix Reply based on the temporary array
 		for (int row = 0; row < tempMatrix.length; row++) {
-			Row.Builder tempRow = Row.newBuilder();
 			for (int col = 0; col < tempMatrix[row].length; col++) {
-				tempRow.addNumber(tempMatrix[row][col]);
+				stringReply += tempMatrix[row][col] + " ";
 			}
-			tempRow.setPosition(A.get(row).getPosition());
-			c.addC(tempRow);
+			stringReply += "<br>";
 		}
+
+		c.setC(stringReply);
+		c.setPosition(request.getPosition());
 
 		MatrixReply response = c.build();
 		reply.onNext(response);
