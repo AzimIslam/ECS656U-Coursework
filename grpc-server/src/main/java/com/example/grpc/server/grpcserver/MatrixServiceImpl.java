@@ -56,6 +56,13 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 		// Temporary array for storing matrix
 		Double[][] tempMatrix = new Double[A.size()][A.size()];
 
+		// Populate c with zeroes
+		for (int i = 0; i < tempMatrix.length; i++) {
+			for (int j = 0; j < tempMatrix[i].length; j++) {
+				tempMatrix[i][j] = 0.0;
+			}
+		}
+
 		for (int row = 0; row < A.size(); row++) {
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
 				for (int i = 0; i < A.get(row).getNumberList().size(); i++) {
@@ -95,6 +102,13 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 		Double[][] tempMatrix = new Double[request.getRangeList().get(1) - request.getRangeList().get(0)][A.get(0).getNumberList().size()];
 
 
+		// Populate c with zeroes
+		for (int i = 0; i < tempMatrix.length; i++) {
+			for (int j = 0; j < tempMatrix[i].length; j++) {
+				tempMatrix[i][j] = 0.0;
+			}
+		}
+
 		for (int row = request.getRangeList().get(0); row < request.getRangeList().get(1); row++) {
 			for (int col = 0; col < A.get(row).getNumberList().size(); col++) {
 				for (int i = 0; i < A.get(row).getNumberList().size(); i++) {
@@ -112,6 +126,8 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase
 			}
 			stringReply += "<br>";
 		}
+
+		
 
 		c.setC(stringReply);
 		c.setPosition(request.getPosition());

@@ -89,7 +89,6 @@ public class GRPCClientService {
 				public void onNext(MatrixReply value) {
 					String matrix = value.getC();
 					responses[value.getPosition()-1] = matrix;
-					locks[0] -= 1;
 				}
 			
 				@Override
@@ -99,6 +98,7 @@ public class GRPCClientService {
 			
 				@Override
 				public void onCompleted() {
+					locks[0] -= 1;
 					System.out.println("A server has completed adding " + String.valueOf(numberOfRows) +  " rows");
 				}
 			};
@@ -137,6 +137,11 @@ public class GRPCClientService {
 
 			for(int i=0; i < numOfServersRequired; i++) {
 				stubs[i].addBlock(requests[i].build(), MatrixCallback);
+				try {
+					TimeUnit.MILLISECONDS.sleep((int)(Math.random()*1000));
+				} catch (InterruptedException e) {
+					System.out.println(e);
+				}
 			}
 
 
@@ -228,7 +233,6 @@ public class GRPCClientService {
 				public void onNext(MatrixReply value) {
 					String matrix = value.getC();
 					responses[value.getPosition()-1] = matrix;
-					locks[0] -= 1;
 				}
 			
 				@Override
@@ -238,6 +242,7 @@ public class GRPCClientService {
 			
 				@Override
 				public void onCompleted() {
+					locks[0] -= 1;
 					System.out.println("A server has completed adding " + String.valueOf(numberOfRows) +  " rows");
 				}
 			};
